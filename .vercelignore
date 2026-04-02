@@ -1,0 +1,10 @@
+# 忽略所有Node.js相关文件，这是纯静态站点
+node_modules/
+package-lock.json
+*.log
+.DS_Store
+.git/
+.vscode/
+.idea/
+coverage/
+test-results/

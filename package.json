@@ -32,9 +32,7 @@
   ],
   "author": "ConcaXu <your-email@example.com>",
   "license": "MIT",
-  "dependencies": {
-    "node-cron": "^3.0.3"
-  },
+  "dependencies": {},
   "devDependencies": {},
   "engines": {
     "node": ">=18.0.0"
