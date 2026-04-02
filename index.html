@@ -318,10 +318,10 @@
             });
         });
         
-        // 添加商品监控
-        document.getElementById('addProductBtn').addEventListener('click', function() {
+        // 添加商品监控（使用真实API）
+        document.getElementById('addProductBtn').addEventListener('click', async function() {
             const url = document.getElementById('productUrl').value.trim();
-            const name = document.getElementById('productName').value.trim() || '未命名商品';
+            const name = document.getElementById('productName').value.trim() || '待获取...';
             const targetPrice = parseFloat(document.getElementById('targetPrice').value) || 0;
             const platform = document.querySelector('.platform-badge.active').dataset.platform;
             
@@ -330,33 +330,96 @@
                 return;
             }
             
-            // 生成模拟价格
-            const basePrice = targetPrice > 0 ? targetPrice * 0.8 : Math.random() * 1000 + 100;
-            const currentPrice = basePrice + (Math.random() * 100 - 50);
+            // 禁用按钮，防止重复点击
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '🦞 获取价格中...';
             
-            const product = {
-                id: Date.now(),
-                url,
-                name,
-                platform,
-                targetPrice,
-                currentPrice: currentPrice.toFixed(2),
-                lowestPrice: (currentPrice * 0.9).toFixed(2),
-                highestPrice: (currentPrice * 1.2).toFixed(2),
-                lastChecked: new Date().toLocaleTimeString(),
-                isActive: true
-            };
-            
-            monitoringProducts.push(product);
-            saveToLocalStorage();
-            updateMonitoringList();
-            
-            // 清空表单
-            document.getElementById('productUrl').value = '';
-            document.getElementById('productName').value = '';
-            
-            addConsoleOutput(`✅ 已添加监控: ${name} (目标价: ¥${targetPrice})`, 'success');
-            addConsoleOutput(`📱 当前价格: ¥${product.currentPrice}`, 'info');
+            try {
+                addConsoleOutput(`🔍 正在获取商品价格...`, 'info');
+                
+                // 调用真实API获取价格
+                const response = await fetch('/api/check-price', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const productName = data.title || name;
+                    const currentPrice = data.price;
+                    const isMock = data.isMock || false;
+                    
+                    const product = {
+                        id: Date.now(),
+                        url,
+                        name: productName,
+                        platform: data.platform || platform,
+                        targetPrice,
+                        currentPrice: currentPrice.toFixed(2),
+                        lowestPrice: currentPrice.toFixed(2), // 初始最低价就是当前价
+                        highestPrice: currentPrice.toFixed(2), // 初始最高价就是当前价
+                        lastChecked: new Date().toLocaleTimeString(),
+                        isActive: true,
+                        isMock: isMock
+                    };
+                    
+                    monitoringProducts.push(product);
+                    saveToLocalStorage();
+                    updateMonitoringList();
+                    
+                    // 清空表单
+                    document.getElementById('productUrl').value = '';
+                    document.getElementById('productName').value = '';
+                    
+                    addConsoleOutput(`✅ 已添加监控: ${productName} (目标价: ¥${targetPrice})`, 'success');
+                    addConsoleOutput(`📱 当前价格: ¥${currentPrice.toFixed(2)} ${isMock ? '(模拟数据)' : '(真实数据)'}`, 'info');
+                    
+                    if (isMock) {
+                        addConsoleOutput('💡 提示: 这是模拟数据，真实抓取可能被反爬虫限制', 'info');
+                    }
+                } else {
+                    addConsoleOutput(`❌ 获取价格失败: ${data.message || '未知错误'}`, 'error');
+                }
+                
+            } catch (error) {
+                console.error('API调用错误:', error);
+                addConsoleOutput(`❌ 网络错误: ${error.message}`, 'error');
+                
+                // 出错时使用模拟数据
+                const mockPrice = targetPrice > 0 ? targetPrice * 0.8 : Math.random() * 500 + 50;
+                const product = {
+                    id: Date.now(),
+                    url,
+                    name: name === '待获取...' ? '模拟商品' : name,
+                    platform,
+                    targetPrice,
+                    currentPrice: mockPrice.toFixed(2),
+                    lowestPrice: mockPrice.toFixed(2),
+                    highestPrice: mockPrice.toFixed(2),
+                    lastChecked: new Date().toLocaleTimeString(),
+                    isActive: true,
+                    isMock: true
+                };
+                
+                monitoringProducts.push(product);
+                saveToLocalStorage();
+                updateMonitoringList();
+                
+                document.getElementById('productUrl').value = '';
+                document.getElementById('productName').value = '';
+                
+                addConsoleOutput(`✅ 已添加监控（模拟数据）: ${product.name}`, 'success');
+                addConsoleOutput(`📱 当前价格: ¥${mockPrice.toFixed(2)} (模拟)`, 'info');
+            } finally {
+                // 恢复按钮
+                btn.disabled = false;
+                btn.innerHTML = '🦞 添加监控';
+            }
         });
         
         // 启动监控服务
@@ -411,34 +474,92 @@
             checkAllProducts();
         });
         
-        // 检查所有商品价格
-        function checkAllProducts() {
-            monitoringProducts.forEach((product, index) => {
-                // 模拟价格波动
-                const change = (Math.random() * 0.1 - 0.05); // -5% 到 +5%
-                const oldPrice = parseFloat(product.currentPrice);
-                const newPrice = oldPrice * (1 + change);
+        // 检查所有商品价格（使用真实API）
+        async function checkAllProducts() {
+            if (monitoringProducts.length === 0) return;
+            
+            addConsoleOutput(`🔍 开始检查 ${monitoringProducts.length} 个商品...`, 'info');
+            
+            for (let i = 0; i < monitoringProducts.length; i++) {
+                const product = monitoringProducts[i];
                 
-                product.currentPrice = newPrice.toFixed(2);
-                product.lastChecked = new Date().toLocaleTimeString();
-                
-                // 更新最低/最高价
-                if (newPrice < parseFloat(product.lowestPrice)) {
-                    product.lowestPrice = newPrice.toFixed(2);
+                try {
+                    // 调用API获取最新价格
+                    const response = await fetch('/api/check-price', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ url: product.url })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const oldPrice = parseFloat(product.currentPrice);
+                        const newPrice = data.price;
+                        const isMock = data.isMock || false;
+                        
+                        // 更新商品信息
+                        product.currentPrice = newPrice.toFixed(2);
+                        product.lastChecked = new Date().toLocaleTimeString();
+                        product.isMock = isMock;
+                        
+                        // 更新商品名称（如果API返回了更好的名称）
+                        if (data.title && data.title !== '未知商品' && data.title !== '模拟商品') {
+                            product.name = data.title;
+                        }
+                        
+                        // 更新最低/最高价
+                        if (newPrice < parseFloat(product.lowestPrice)) {
+                            product.lowestPrice = newPrice.toFixed(2);
+                        }
+                        if (newPrice > parseFloat(product.highestPrice)) {
+                            product.highestPrice = newPrice.toFixed(2);
+                        }
+                        
+                        // 检查是否达到目标价
+                        if (product.targetPrice > 0 && newPrice <= product.targetPrice) {
+                            addConsoleOutput(`🎉 降价提醒！${product.name} 当前价格: ¥${newPrice.toFixed(2)} (目标: ¥${product.targetPrice})`, 'success');
+                            showNotification(product.name, newPrice, product.targetPrice);
+                        }
+                        
+                        // 显示价格变化
+                        const change = ((newPrice - oldPrice) / oldPrice * 100).toFixed(2);
+                        const changeSymbol = change >= 0 ? '📈' : '📉';
+                        addConsoleOutput(`${changeSymbol} ${product.name}: ¥${oldPrice.toFixed(2)} → ¥${newPrice.toFixed(2)} (${change}%) ${isMock ? '(模拟)' : ''}`, 'info');
+                        
+                        // 更新显示
+                        updateProductInList(i);
+                        
+                    } else {
+                        addConsoleOutput(`❌ ${product.name}: 获取价格失败`, 'error');
+                    }
+                    
+                } catch (error) {
+                    addConsoleOutput(`❌ ${product.name}: 网络错误 - ${error.message}`, 'error');
+                    
+                    // 出错时使用模拟波动
+                    const change = (Math.random() * 0.1 - 0.05);
+                    const oldPrice = parseFloat(product.currentPrice);
+                    const newPrice = oldPrice * (1 + change);
+                    
+                    product.currentPrice = newPrice.toFixed(2);
+                    product.lastChecked = new Date().toLocaleTimeString();
+                    product.isMock = true;
+                    
+                    // 检查是否达到目标价
+                    if (product.targetPrice > 0 && newPrice <= product.targetPrice) {
+                        addConsoleOutput(`🎉 降价提醒（模拟）！${product.name} 当前价格: ¥${newPrice.toFixed(2)} (目标: ¥${product.targetPrice})`, 'success');
+                        showNotification(product.name, newPrice, product.targetPrice);
+                    }
+                    
+                    updateProductInList(i);
                 }
-                if (newPrice > parseFloat(product.highestPrice)) {
-                    product.highestPrice = newPrice.toFixed(2);
-                }
                 
-                // 检查是否达到目标价
-                if (product.targetPrice > 0 && newPrice <= product.targetPrice) {
-                    addConsoleOutput(`🎉 降价提醒！${product.name} 当前价格: ¥${newPrice.toFixed(2)} (目标: ¥${product.targetPrice})`, 'success');
-                    showNotification(product.name, newPrice, product.targetPrice);
-                }
-                
-                // 更新显示
-                updateProductInList(index);
-            });
+                // 避免请求过快（对API友好）
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
             
             saveToLocalStorage();
             addConsoleOutput(`✅ 价格检查完成 (${new Date().toLocaleTimeString()})`, 'info');
