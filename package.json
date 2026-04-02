@@ -11,8 +11,6 @@
     "dev": "node monitor.js check",
     "test": "node test/simple.test.js",
     "test:basic": "node test-basic.js",
-    "lint": "eslint . --ext .js",
-    "format": "prettier --write .",
     "add": "node monitor.js add",
     "list": "node monitor.js list",
     "check": "node monitor.js check",
@@ -37,11 +35,7 @@
   "dependencies": {
     "node-cron": "^3.0.3"
   },
-  "devDependencies": {
-    "eslint": "^8.56.0",
-    "prettier": "^3.2.4",
-    "mocha": "^10.2.0"
-  },
+  "devDependencies": {},
   "engines": {
     "node": ">=18.0.0"
   },
