@@ -1,0 +1,61 @@
+{
+  "name": "ecommerce-price-monitor",
+  "version": "1.0.0",
+  "description": "🦞 电商价格监控工具 - 自动监控淘宝、京东、拼多多商品价格变化，发送降价提醒，帮助用户抓住最佳购买时机",
+  "main": "monitor.js",
+  "bin": {
+    "ecommerce-price-monitor": "./cli/index.js"
+  },
+  "scripts": {
+    "start": "node monitor.js start",
+    "dev": "node monitor.js check",
+    "test": "node test-basic.js",
+    "lint": "eslint . --ext .js",
+    "format": "prettier --write .",
+    "add": "node monitor.js add",
+    "list": "node monitor.js list",
+    "check": "node monitor.js check",
+    "report": "node monitor.js report",
+    "demo": "open demo.html || xdg-open demo.html || echo '请手动打开 demo.html'"
+  },
+  "keywords": [
+    "ecommerce",
+    "price-monitor",
+    "taobao",
+    "jd",
+    "pdd",
+    "openclaw",
+    "skill",
+    "shopping",
+    "discount",
+    "automation",
+    "china"
+  ],
+  "author": "ConcaXu <your-email@example.com>",
+  "license": "MIT",
+  "dependencies": {
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ConcaXu/ecommerce-price-monitor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ConcaXu/ecommerce-price-monitor/issues"
+  },
+  "homepage": "https://github.com/ConcaXu/ecommerce-price-monitor#readme",
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/ConcaXu"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

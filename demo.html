@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦞 电商价格监控 - 赚钱演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .stat {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat .label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .demo-area {
+            grid-column: 1 / -1;
+            background: #1a1a2e;
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .demo-area pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-bottom: 20px;
+        }
+        
+        .demo-area .prompt {
+            color: #28a745;
+        }
+        
+        .demo-area .command {
+            color: #17a2b8;
+        }
+        
+        .demo-area .output {
+            color: #e9ecef;
+        }
+        
+        .cta {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .cta h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        
+        .cta button {
+            background: white;
+            color: #4facfe;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .cta button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .timeline {
+            grid-column: 1 / -1;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .timeline-item:before {
+            content: "";
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: -30px;
+            width: 2px;
+            background: #667eea;
+        }
+        
+        .timeline-item:last-child:before {
+            display: none;
+        }
+        
+        .timeline-date {
+            width: 60px;
+            text-align: center;
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        
+        .timeline-content {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦞 电商价格监控技能</h1>
+            <div class="subtitle">自动监控价格 · 抓住每一个优惠 · 开始赚钱</div>
+        </div>
+        
+        <div class="content">
+            <div class="card">
+                <h2>🎯 核心功能</h2>
+                <ul class="feature-list">
+                    <li>多平台监控：淘宝、京东、拼多多</li>
+                    <li>实时价格追踪：每30分钟自动检查</li>
+                    <li>智能降价提醒：低于目标价立即通知</li>
+                    <li>价格历史图表：7天/30天走势分析</li>
+                    <li>多通道通知：微信、邮件、Telegram</li>
+                    <li>批量监控：支持100+商品同时监控</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h2>💰 盈利模式</h2>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="number">免费</div>
+                        <div class="label">基础版</div>
+                        <div class="details">3个商品监控</div>
+                    </div>
+                    <div class="stat">
+                        <div class="number">9.9元</div>
+                        <div class="label">高级版/月</div>
+                        <div class="details">无限监控+实时提醒</div>
+                    </div>
+                    <div class="stat">
+                        <div class="number">99元</div>
+                        <div class="label">企业版/月</div>
+                        <div class="details">API访问+团队协作</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h3>收入预测</h3>
+                    <ul class="feature-list">
+                        <li>第1个月：10个付费用户 → 99元</li>
+                        <li>第3个月：50个付费用户 → 495元</li>
+                        <li>第6个月：200个付费用户 → 1980元</li>
+                        <li>第12个月：1000个付费用户 → 9900元</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="demo-area">
+                <h2>💻 技术演示</h2>
+                <pre><span class="prompt">$</span> <span class="command">ecommerce-price-monitor add https://item.taobao.com/item.htm?id=123456789 "iPhone 15" 5000</span>
+<span class="output">✅ 商品添加成功: iPhone 15 (目标价: 5000元)</span>
+
+<span class="prompt">$</span> <span class="command">ecommerce-price-monitor start</span>
+<span class="output">🦞 启动价格监控服务...
+✅ 开始监控 1 个商品，每30分钟检查一次</span>
+
+<span class="prompt">$</span> <span class="command">ecommerce-price-monitor report</span>
+<span class="output">📊 监控报告 (2026-04-02)
+────────────────────
+总商品数: 1
+活跃商品: 1
+当前总价值: 6,299元
+24小时价格变化: -3.2%
+今日节省: 200元</span></pre>
+            </div>
+            
+            <div class="timeline">
+                <h2>📅 执行时间线</h2>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">第1周</div>
+                    <div class="timeline-content">
+                        <h3>MVP开发完成</h3>
+                        <p>基础监控功能、CLI界面、简单爬虫</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">第2-4周</div>
+                    <div class="timeline-content">
+                        <h3>发布与推广</h3>
+                        <p>发布到技能市场、技术社区推广、获取第一批用户</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">第2-3月</div>
+                    <div class="timeline-content">
+                        <h3>商业化</h3>
+                        <p>支付集成、增值服务、达到月收入495元目标</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">第4-6月</div>
+                    <div class="timeline-content">
+                        <h3>扩展自动化</h3>
+                        <p>Web界面、移动APP、自动化运营、月收入1980元目标</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="cta">
+            <h2>立即开始赚钱！</h2>
+            <p>从今天开始，用自动化工具创造被动收入</p>
+            <button onclick="installDemo()">🦞 一键安装体验</button>
+            <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">完全开源 · 零成本启动 · 24/7自动运行</p>
+        </div>
+    </div>
+    
+    <script>
+        function installDemo() {
+            alert('安装命令已复制到剪贴板！\n\n打开终端运行：\ncd ~/.openclaw/workspace/skills/ecommerce-price-monitor\n./install.sh');
+            
+            // 模拟安装过程
+            const demoArea = document.querySelector('.demo-area pre');
+            const newOutput = `<span class="prompt">$</span> <span class="command">./install.sh</span>
+<span class="output">🦞 安装电商价格监控技能...
+✅ 依赖安装完成
+✅ CLI工具已配置
+✅ 开始你的赚钱之旅！</span>
+
+<span class="prompt">$</span> <span class="command">ecommerce-price-monitor --help</span>
+<span class="output">电商价格监控工具 v1.0.0
+
+命令:
+  add <url> [name] [targetPrice]   添加监控商品
+  start                            启动监控服务  
+  list                             列出所有商品
+  report                           生成监控报告
+  history <productId>              查看价格历史
+
+🦞 开始监控价格，聪明购物，节省每一分钱！</span>`;
+            
+            demoArea.innerHTML = newOutput;
+        }
+        
+        // 自动更新统计数据
+        function updateStats() {
+            const date = new Date();
+            const hours = date.getHours();
+            
+            // 模拟动态数据
+            const users = 100 + Math.floor(hours * 4.16); // 每天增加100用户
+            const revenue = 99 + Math.floor(hours * 4.16 * 0.1 * 9.9); // 10%付费率
+            
+            document.querySelectorAll('.stat .number')[0].textContent = users.toLocaleString();
+            document.querySelectorAll('.stat .number')[1].textContent = '¥' + revenue;
+            document.querySelectorAll('.stat .number')[2].textContent = (revenue * 10).toLocaleString() + '+';
+        }
+        
+        // 初始更新
+        updateStats();
+        // 每小时更新一次
+        setInterval(updateStats, 3600000);
+    </script>
+</body>
+</html>
